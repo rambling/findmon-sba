@@ -39,7 +39,7 @@ router.get('/arduino/location', function(req, res, next) {
 
             var direction;
             var remainingMin = Math.round(results.totalTime / 60);
-            var additionalInfo = "(" + results.compasLoc + ") " + results.totalDistance + "m " + results.totalTime + "sec";
+            var additionalInfo = "(" + results.compasLoc + ") " + results.totalDistance + "m " + remainingMin + "min";
 
             if ( 0 < results.degree < 180 ) {
             	direction = "LEFT" + additionalInfo;
