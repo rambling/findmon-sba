@@ -43,9 +43,9 @@ Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(32, 8, PIN,
 
 const String TAG_MESSAGE = "[MESSAGE]";
 const String TAG_NOTIFICATION = "[NOTIFICATION]";
-const uint16_t colors[] = { matrix.Color(255, 0, 0), matrix.Color(0, 255, 0), matrix.Color(0, 0, 255) };
+const uint16_t colors[] = { matrix.Color(255, 0, 0), matrix.Color(0, 255, 0), matrix.Color(230, 230, 0) };
 const String notifications[] = {
-  "Tag me, get the 20\% coupon",
+  "Tag me, get the 20\% coupon.",
   "Today is a recycling day!",
   "Have a nice day."
 };
