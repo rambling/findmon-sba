@@ -4,6 +4,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_NeoMatrix.h>
 #include <Adafruit_NeoPixel.h>
+#include <SPI.h>
 #ifndef PSTR
  #define PSTR // Make Arduino Due happy
 #endif
@@ -40,28 +41,122 @@ Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(32, 8, PIN,
   NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG,
   NEO_GRB            + NEO_KHZ800);
 
-const uint16_t colors[] = {
-  matrix.Color(255, 0, 0), matrix.Color(0, 255, 0), matrix.Color(0, 0, 255) };
+const String TAG_MESSAGE = "[MESSAGE]";
+const String TAG_NOTIFICATION = "[NOTIFICATION]";
+const uint16_t colors[] = { matrix.Color(255, 0, 0), matrix.Color(0, 255, 0), matrix.Color(0, 0, 255) };
+const String notifications[] = {
+  "Tag me, get the 20\% coupon",
+  "Today is a recycling day!",
+  "Have a nice day."
+};
+
+int matrixWidth = matrix.width();
+int notiIdx = 0;
+int showMsgRepeat = 5;
+int longMsgRepeat = 3;
+String message = "";
 
 void setup() {
+  initMatix();
+  initSerial();
+}
+
+void loop() {
+  if (message.length() > 0 || existSerialInput()) {
+    int repeat = 1;
+    if (message.length() * 6 - 1 > 32) {
+      repeat = longMsgRepeat;
+    } else {
+      repeat = showMsgRepeat;
+    }
+
+    displayText(message, repeat, colors[1]);
+  } else {
+    displayText(notifications[notiIdx++], 1, colors[2]);
+    if (notiIdx > 1) {
+      notiIdx = 0;
+    }
+  }
+}
+
+void initMatix() {
   matrix.begin();
   matrix.setTextWrap(false);
   matrix.setBrightness(40);
   matrix.setTextColor(colors[0]);
 }
 
-int x    = matrix.width();
-int pass = 0;
+void displayText(String text, int repeat, uint16_t color) {
 
-void loop() {
-  matrix.fillScreen(0);
-  matrix.setCursor(x, 0);
-  matrix.print(F("Findmon.com"));
-  if(--x < -36) {
-    x = matrix.width();
-    if(++pass >= 3) pass = 0;
-    matrix.setTextColor(colors[pass]);
+  //scrolling text
+  int textPixelWidth = text.length() * 6 - 1;
+  int count = 0;
+  bool forceStop = false;
+
+  for(int i = 0; i < repeat; i++) {
+
+    if (textPixelWidth > matrixWidth) {
+      for (int scrollIndex = matrixWidth; scrollIndex > -textPixelWidth; scrollIndex--) {
+        matrix.fillScreen(0);
+        matrix.setCursor(scrollIndex, 0);
+        matrix.print(text);
+        matrix.setTextColor(color);
+        matrix.show();
+        delay(70);
+
+        if (existSerialInput()) {
+          forceStop = true;
+          break;
+        }
+      }
+
+    } else {
+      matrix.fillScreen(0);
+      matrix.setCursor(0, 0);
+      matrix.print(F(""));
+      matrix.setTextColor(color);
+      matrix.show();
+      delay(70);
+      matrix.setCursor(0, 0);
+      matrix.print(text);
+      matrix.setTextColor(color);
+      matrix.show();
+      delay(150);
+    }
+
+    if (forceStop) {
+      return;
+    }
   }
-  matrix.show();
-  delay(100);
+
+  message = "";
+}
+
+void initSerial(){
+  //Setup Serial Port with baud rate of 9600
+  Serial.begin(9600);
+}
+
+bool existSerialInput() {
+  bool exist = false;
+  String input = "";
+
+  while (Serial.available()) {
+    char charRead = Serial.read();
+    input.concat(charRead);
+  }
+
+  input.trim();
+
+  if (input.length() > 0) {
+    if (input.indexOf(TAG_MESSAGE) > -1) {
+      input.replace(TAG_MESSAGE, "");
+      exist = true;
+      message = input;
+    } else if (input.startsWith(TAG_NOTIFICATION)) {
+      input.replace(TAG_NOTIFICATION, "");
+    }
+  }
+
+  return exist;
 }
