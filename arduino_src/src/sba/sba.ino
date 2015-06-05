@@ -52,7 +52,7 @@ const String notifications[] = {
 
 int matrixWidth = matrix.width();
 int notiIdx = 0;
-int showMsgRepeat = 5;
+int showMsgRepeat = 10;
 int longMsgRepeat = 3;
 String message = "";
 
@@ -102,7 +102,7 @@ void displayText(String text, int repeat, uint16_t color) {
         matrix.print(text);
         matrix.setTextColor(color);
         matrix.show();
-        delay(70);
+        delay(50);
 
         if (existSerialInput()) {
           forceStop = true;
@@ -111,13 +111,12 @@ void displayText(String text, int repeat, uint16_t color) {
       }
 
     } else {
+      int x = (matrixWidth - textPixelWidth) / 2;
       matrix.fillScreen(0);
-      matrix.setCursor(0, 0);
-      matrix.print(F(""));
       matrix.setTextColor(color);
       matrix.show();
       delay(70);
-      matrix.setCursor(0, 0);
+      matrix.setCursor(x, 0);
       matrix.print(text);
       matrix.setTextColor(color);
       matrix.show();
