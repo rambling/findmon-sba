@@ -38,20 +38,23 @@ router.get('/arduino/location', function(req, res, next) {
             console.dir(results);
 
             var direction;
+            var remainingMin = Math.round(results.totalTime / 60);
+            var additionalInfo = "(" + results.compasLoc + ") " + results.totalDistance + "m " + results.totalTime + "sec";
+
             if ( 0 < results.degree < 180 ) {
-            	direction = "LEFT";
+            	direction = "LEFT" + additionalInfo;
             } else if (180 < results.degree < 360) {
-            	direction = "RIGHT";
+            	direction = "RIGHT" + additionalInfo;
             } else if ( results.degree === 0 || results.degree === 360) {
-            	direction = "BACK";
+            	direction = "BACK" + additionalInfo;
             } else if (results.degree === 180) {
-            	direction = "FORWARD";
+            	direction = "FORWARD" + additionalInfo;
             } else {
             	direction = "UNKNOWN";
             }
             arduino.sendMessage(direction);
         } else {
-            arduino.sendMessage('Sorry');
+            arduino.sendMessage('Sorry.');
         }
     });
 });
