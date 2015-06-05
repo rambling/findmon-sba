@@ -19,6 +19,13 @@ router.get('/arduino/display', function(req, res, next) {
 			results: results
 		});
 	});
-
 });
+
+router.get('/arduino/location', function(req, res, next) {
+    var lat = req.param('lat');
+    var lon = req.param('lon');
+    console.info('[NFC] lat: ' + lat + " | lon: " + lon);
+    res.send(200);
+});
+
 module.exports = router;
