@@ -2,6 +2,7 @@ var express = require('express');
 var request = require('request');
 var router = express.Router();
 var arduino = require('../lib/arduino');
+var poleInfo = require('../device-info.json');
 
 var rest = {
     getDirection: 'http://findmon.asuscomm.com:58081/information/getDirection.mon?poleId={poleId}&endX={endX}&endY={endY}'
@@ -59,7 +60,7 @@ module.exports = router;
 
 function getDirectionInfo(lat, lon, cb) {
     var url = rest.getDirection;
-    url = url.replace('{poleId}', 'p2');
+    url = url.replace('{poleId}', poleInfo.id || 'p1');
     url = url.replace('{endX}', lon);
     url = url.replace('{endY}', lat);
 
