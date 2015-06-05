@@ -147,6 +147,10 @@ bool existSerialInput() {
 
   input.trim();
 
+  if (input.length() > 100) {
+    return exit;
+  }
+
   if (input.length() > 0) {
     if (input.indexOf(TAG_MESSAGE) > -1) {
       input.replace(TAG_MESSAGE, "");
